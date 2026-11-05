@@ -1,0 +1,28 @@
+# DigitalOcean App Platform: daily scheduled job built from the Dockerfile.
+# Create with: doctl apps create --spec .do/app.yaml   (fill in repo, then set the secrets in the console)
+name: helpcenter-sync
+region: nyc
+jobs:
+  - name: daily-sync
+    kind: SCHEDULED
+    schedule:
+      cron: "15 2 * * *"
+      time_zone: UTC
+    github:
+      repo: DoTranMinhChu/helpcenter-sync
+      branch: main
+      deploy_on_push: true
+    dockerfile_path: Dockerfile
+    run_command: python main.py
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    envs:
+      - key: OPENAI_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: VECTOR_STORE_ID
+        scope: RUN_TIME
+      - key: LOG_GIST_ID
+        scope: RUN_TIME
+      - key: GITHUB_TOKEN
+        scope: RUN_TIME
+        type: SECRET
